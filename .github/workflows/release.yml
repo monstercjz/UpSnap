@@ -15,14 +15,18 @@ jobs:
       - name: Set runner
         id: set-runner
         run: |
-          runners=$(curl -s -H "Accept: application/vnd.github+json" \
+          if [ -z "${{ secrets.REPO_ACCESS_TOKEN }}" ]; then
+            echo "runner-label=ubuntu-latest" >> "$GITHUB_OUTPUT"
+          else
+            runners=$(curl -s -H "Accept: application/vnd.github+json" \
             -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/runners")
-          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")')
-          if [ -n "$available" ]; then
-            echo "runner-label=self-hosted" >> "$GITHUB_OUTPUT"
-          else
-            echo "runner-label=ubuntu-latest" >> "$GITHUB_OUTPUT"
+            available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")' 2>/dev/null || echo "")
+            if [ -n "$available" ]; then
+              echo "runner-label=self-hosted" >> "$GITHUB_OUTPUT"
+            else
+              echo "runner-label=ubuntu-latest" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
   frontend:
@@ -113,7 +117,6 @@ jobs:
           workdir: backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AUR_KEY: ${{ secrets.AUR_KEY }}
 
       - name: Upload backend artifact
         uses: actions/upload-artifact@v7
@@ -164,12 +167,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v7
