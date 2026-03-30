@@ -2,7 +2,8 @@ name: go test
 
 on:
   push:
-    paths: backend/**
+    paths:
+      - backend/**
 
 jobs:
   check-runner:
@@ -25,9 +26,9 @@ jobs:
             fi
           fi
 
-    build:
-      needs: check-runner
-      runs-on: ${{ needs.check-runner.outputs.runner-label }}
+  build:
+    needs: check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
       - uses: actions/checkout@v6
       - name: Set up Go
