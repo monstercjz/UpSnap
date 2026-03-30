@@ -143,8 +143,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/seriousm4x/UpSnap
-            seriousm4x/UpSnap
+            ghcr.io/monstercjz/UpSnap
+            monstercjz/UpSnap
           tags: |
             type=ref,event=tag
             type=semver,pattern={{version}}

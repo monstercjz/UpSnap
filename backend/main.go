@@ -4,7 +4,7 @@ import (
 	"embed"
 
 	"github.com/pocketbase/pocketbase/apis"
-	"github.com/seriousm4x/upsnap/pb"
+	"github.com/monstercjz/upsnap/pb"
 )
 
 //go:embed all:pb_public

@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/seriousm4x/upsnap/logger"
+	"github.com/monstercjz/upsnap/logger"
 )
 
 type SolResponse struct {

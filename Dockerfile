@@ -5,7 +5,7 @@ ARG TARGETVARIANT
 ARG VERSION
 ENV BUILDX_ARCH="${TARGETOS:-linux}_${TARGETARCH:-amd64}${TARGETVARIANT}"
 WORKDIR /app
-RUN wget https://github.com/seriousm4x/UpSnap/releases/download/${VERSION}/UpSnap_${VERSION}_${BUILDX_ARCH}.zip &&\
+RUN wget https://github.com/monstercjz/UpSnap/releases/download/${VERSION}/UpSnap_${VERSION}_${BUILDX_ARCH}.zip &&\
     unzip UpSnap_${VERSION}_${BUILDX_ARCH}.zip &&\
     rm -f UpSnap_${VERSION}_${BUILDX_ARCH}.zip &&\
     chmod +x upsnap &&\
