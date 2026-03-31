@@ -7,27 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-runner:
-    runs-on: ubuntu-latest
-    outputs:
-      runner-label: ${{ steps.set-runner.outputs.runner-label }}
-    steps:
-      - name: Set runner
-        id: set-runner
-        run: |
-          runners=$(curl -s -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runners")
-          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")')
-          if [ -n "$available" ]; then
-            echo "runner-label=self-hosted" >> "$GITHUB_OUTPUT"
-          else
-            echo "runner-label=ubuntu-latest" >> "$GITHUB_OUTPUT"
-          fi
-
   frontend:
-    needs: check-runner
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -68,9 +49,8 @@ jobs:
 
   goreleaser:
     needs:
-      - check-runner
       - frontend
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -123,10 +103,9 @@ jobs:
 
   docker:
     needs:
-      - check-runner
       - frontend
       - goreleaser
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
