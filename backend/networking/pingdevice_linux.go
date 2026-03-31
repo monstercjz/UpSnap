@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/monstercjz/upsnap/logger"
 	probing "github.com/prometheus-community/pro-bing"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
