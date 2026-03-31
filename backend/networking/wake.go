@@ -46,8 +46,10 @@ func WakeDevice(device *core.Record) error {
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 
+		logger.Info.Printf("Executing wake_cmd for %s (timeout: %d s): %s", device.GetString("name"), wakeTimeout, wake_cmd)
 		if err := cmd.Start(); err != nil {
-			logger.Error.Println(err)
+			logger.Error.Printf("Failed to start wake_cmd for %s: %v", device.GetString("name"), err)
+			return err
 		}
 
 		done := make(chan error, 1)
@@ -61,8 +63,10 @@ func WakeDevice(device *core.Record) error {
 			select {
 			case <-time.After(1 * time.Second):
 				if time.Since(start) >= time.Duration(wakeTimeout)*time.Second {
-					if err := KillProcess(cmd.Process); err != nil {
-						logger.Error.Println(err)
+					if cmd.Process != nil {
+						if err := KillProcess(cmd.Process); err != nil {
+							logger.Error.Println(err)
+						}
 					}
 					return fmt.Errorf("%s not online after %d seconds", device.GetString("name"), wakeTimeout)
 				}
@@ -72,18 +76,21 @@ func WakeDevice(device *core.Record) error {
 					return err
 				}
 				if isOnline {
-					if err := KillProcess(cmd.Process); err != nil {
-						logger.Error.Println(err)
+					if cmd.Process != nil {
+						if err := KillProcess(cmd.Process); err != nil {
+							// Process might have already finished
+						}
 					}
+					logger.Info.Printf("Device %s came online after wake_cmd", device.GetString("name"))
 					return nil
 				}
 			case err := <-done:
 				if err != nil {
-					if err := KillProcess(cmd.Process); err != nil {
-						logger.Error.Println(err)
-					}
-					return fmt.Errorf("%s", stderr.String())
+					logger.Error.Printf("wake_cmd for %s failed: %v. Stderr: %s", device.GetString("name"), err, stderr.String())
+					return fmt.Errorf("wake_cmd failed: %s", stderr.String())
 				}
+				logger.Info.Printf("wake_cmd for %s finished (waiting for device to come online...)", device.GetString("name"))
+				// Command finished successfully, but we continue the loop until device is online or timeout
 			}
 		}
 	} else {
