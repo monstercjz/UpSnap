@@ -62,18 +62,11 @@ func PingDevice(device *core.Record) (bool, error) {
 		err := cmd.Run()
 
 		if err != nil {
-			// 检查是否是进程退出错误
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				exitCode := exitErr.ExitCode()
-				// 退出码 1 视为正常的"设备离线"状态，不返回 error
-				// 这与内置 ICMP ping 的行为一致（isNoRouteOrDownError 返回 false, nil）
-				if exitCode == 1 {
-					return false, nil
-				}
-				// 其他非零退出码（如 127 命令不存在）视为真正错误
-				return false, fmt.Errorf("custom ping command failed with exit code %d: %w", exitCode, err)
+				logger.Info.Printf("Custom ping for %s (id: %s) returned exit code %d. Treating as offline.", device.GetString("name"), device.Id, exitCode)
+				return false, nil
 			}
-			// 系统级错误（如无法启动进程）
 			return false, fmt.Errorf("custom ping command execution failed: %w", err)
 		}
 		return true, nil

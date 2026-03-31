@@ -1,6 +1,6 @@
 module github.com/monstercjz/upsnap
 
-go 1.25.0
+go 1.23.0
 
 require (
 	github.com/mdlayher/wol v0.0.0-20220221231636-b763a792253a
