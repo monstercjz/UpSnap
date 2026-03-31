@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/monstercjz/upsnap/logger"
+	"github.com/seriousm4x/upsnap/logger"
 )
 
 func WakeDevice(device *core.Record) error {

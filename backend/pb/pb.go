@@ -13,9 +13,9 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/ghupdate"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/robfig/cron/v3"
-	"github.com/monstercjz/upsnap/cronjobs"
-	"github.com/monstercjz/upsnap/logger"
-	_ "github.com/monstercjz/upsnap/migrations"
+	"github.com/seriousm4x/upsnap/cronjobs"
+	"github.com/seriousm4x/upsnap/logger"
+	_ "github.com/seriousm4x/upsnap/migrations"
 )
 
 var Version = "(untracked)"

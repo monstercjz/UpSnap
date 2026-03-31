@@ -1,4 +1,4 @@
-module github.com/monstercjz/upsnap
+module github.com/seriousm4x/upsnap
 
 go 1.25.0
 
