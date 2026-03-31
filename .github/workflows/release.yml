@@ -123,6 +123,8 @@ jobs:
         with:
           images: |
             ghcr.io/monstercjz/UpSnap
+          flavor: |
+            latest=auto
           tags: |
             type=ref,event=tag
             type=semver,pattern={{version}}
