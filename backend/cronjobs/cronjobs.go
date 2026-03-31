@@ -107,7 +107,9 @@ func SetPingJobs(app *pocketbase.PocketBase) {
 
 func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 	// remove existing jobs
-	for _, job := range CronWakeShutdown.Entries() {
+	entries := CronWakeShutdown.Entries()
+	logger.Info.Printf("Resetting Wake/Shutdown jobs. Current entries: %d", len(entries))
+	for _, job := range entries {
 		CronWakeShutdown.Remove(job.ID)
 	}
 
@@ -116,20 +118,28 @@ func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 		logger.Error.Println(err)
 		return
 	}
+	logger.Info.Printf("Found %d devices to process for cronjobs", len(devices))
+
 	for _, dev := range devices {
 		wake_cron := dev.GetString("wake_cron")
 		wake_cron_enabled := dev.GetBool("wake_cron_enabled")
 		shutdown_cron := dev.GetString("shutdown_cron")
 		shutdown_cron_enabled := dev.GetBool("shutdown_cron_enabled")
 
+		logger.Info.Printf("Device: %s (id: %s). WakeCron: '%s', Enabled: %t", dev.GetString("name"), dev.Id, wake_cron, wake_cron_enabled)
+
 		if wake_cron_enabled && wake_cron != "" {
+			deviceID := dev.Id
+			deviceName := dev.GetString("name")
 			_, err := CronWakeShutdown.AddFunc(wake_cron, func() {
-				d, err := app.FindRecordById("devices", dev.Id)
+				logger.Info.Printf("Cron fired: Wake for %s (id: %s)", deviceName, deviceID)
+				d, err := app.FindRecordById("devices", deviceID)
 				if err != nil {
 					logger.Error.Println(err)
 					return
 				}
 				if d.GetString("status") == "pending" {
+					logger.Info.Printf("Device %s is already pending, skipping wake cron", deviceName)
 					return
 				}
 				isOnline, err := networking.PingDevice(d)
@@ -138,8 +148,10 @@ func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 					return
 				}
 				if isOnline {
+					logger.Info.Printf("Device %s is already online, skipping wake trigger", deviceName)
 					return
 				}
+				logger.Info.Printf("Device %s is offline, proceeding to wake", deviceName)
 				d.Set("status", "pending")
 				if err := app.Save(d); err != nil {
 					logger.Error.Println("Failed to save record:", err)
@@ -156,18 +168,24 @@ func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 				}
 			})
 			if err != nil {
-				logger.Error.Printf("device %s: %+v", dev.GetString("name"), err)
+				logger.Error.Printf("Failed to add wake cron for %s: %+v", deviceName, err)
+			} else {
+				logger.Info.Printf("Successfully registered wake cron for %s", deviceName)
 			}
 		}
 
 		if shutdown_cron_enabled && shutdown_cron != "" {
+			deviceID := dev.Id
+			deviceName := dev.GetString("name")
 			_, err := CronWakeShutdown.AddFunc(shutdown_cron, func() {
-				d, err := app.FindRecordById("devices", dev.Id)
+				logger.Info.Printf("Cron fired: Shutdown for %s (id: %s)", deviceName, deviceID)
+				d, err := app.FindRecordById("devices", deviceID)
 				if err != nil {
 					logger.Error.Println(err)
 					return
 				}
 				if d.GetString("status") == "pending" {
+					logger.Info.Printf("Device %s is already pending, skipping shutdown cron", deviceName)
 					return
 				}
 				isOnline, err := networking.PingDevice(d)
@@ -176,12 +194,15 @@ func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 					return
 				}
 				if !isOnline {
+					logger.Info.Printf("Device %s is already offline, skipping shutdown trigger", deviceName)
 					return
 				}
 				status := d.GetString("status")
 				if status != "online" {
+					logger.Info.Printf("Device %s status is %s (not online), skipping shutdown trigger", deviceName, status)
 					return
 				}
+				logger.Info.Printf("Device %s is online, proceeding to shutdown", deviceName)
 				d.Set("status", "pending")
 				if err := app.Save(d); err != nil {
 					logger.Error.Println("Failed to save record:", err)
@@ -197,7 +218,9 @@ func SetWakeShutdownJobs(app *pocketbase.PocketBase) {
 				}
 			})
 			if err != nil {
-				logger.Error.Printf("device %s: %+v", dev.GetString("name"), err)
+				logger.Error.Printf("Failed to add shutdown cron for %s: %+v", deviceName, err)
+			} else {
+				logger.Info.Printf("Successfully registered shutdown cron for %s", deviceName)
 			}
 		}
 	}
