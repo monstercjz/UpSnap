@@ -117,7 +117,7 @@
 						>
 							<li class="menu-title flex flex-row items-center gap-2">
 								{m.login_menu_title_auth_providers()}
-								<a href="https://github.com/seriousm4x/UpSnap/wiki/Auth-providers" target="_blank"
+								<a href="https://github.com/monstercjz/UpSnap/wiki/Auth-providers" target="_blank"
 									><Fa icon={faQuestionCircle} /></a
 								>
 							</li>

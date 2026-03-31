@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/seriousm4x/upsnap/logger"
+	"github.com/monstercjz/upsnap/logger"
 	"golang.org/x/sys/unix"
 )
 

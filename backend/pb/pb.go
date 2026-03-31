@@ -13,9 +13,9 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/ghupdate"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 	"github.com/robfig/cron/v3"
-	"github.com/seriousm4x/upsnap/cronjobs"
-	"github.com/seriousm4x/upsnap/logger"
-	_ "github.com/seriousm4x/upsnap/migrations"
+	"github.com/monstercjz/upsnap/cronjobs"
+	"github.com/monstercjz/upsnap/logger"
+	_ "github.com/monstercjz/upsnap/migrations"
 )
 
 var Version = "(untracked)"
@@ -61,7 +61,7 @@ func StartPocketBase(distDirFS fs.FS) {
 
 	// GitHub selfupdate
 	ghupdate.MustRegister(app, app.RootCmd, ghupdate.Config{
-		Owner:             "seriousm4x",
+		Owner:             "monstercjz",
 		Repo:              "UpSnap",
 		ArchiveExecutable: "upsnap",
 	})

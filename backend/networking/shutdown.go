@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/seriousm4x/upsnap/logger"
+	"github.com/monstercjz/upsnap/logger"
 )
 
 func ShutdownDevice(device *core.Record) error {

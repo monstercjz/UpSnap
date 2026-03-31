@@ -223,7 +223,7 @@ second (0–59, optional)
 			{m.settings_upsnap_version()}: (untracked)
 		{:else}
 			{m.settings_upsnap_version()}:
-			<a href="https://github.com/seriousm4x/UpSnap/releases/tag/{PUBLIC_VERSION}" class="link"
+			<a href="https://github.com/monstercjz/UpSnap/releases/tag/{PUBLIC_VERSION}" class="link"
 				>{PUBLIC_VERSION}</a
 			>
 		{/if}

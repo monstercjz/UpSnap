@@ -143,8 +143,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/seriousm4x/UpSnap
-            seriousm4x/UpSnap
+            ghcr.io/monstercjz/UpSnap
           tags: |
             type=ref,event=tag
             type=semver,pattern={{version}}
@@ -165,11 +164,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
 
       - name: Build and push
         uses: docker/build-push-action@v7
